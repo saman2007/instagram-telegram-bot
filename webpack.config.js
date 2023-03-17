@@ -1,6 +1,6 @@
 const path = require("path");
 const nodeExternals = require("webpack-node-externals");
-const CopyPlugin = require('copy-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 
 const someOfConfigs = {
   mode: "production",
@@ -15,6 +15,9 @@ const someOfConfigs = {
   },
   resolve: {
     extensions: [".ts", ".js"],
+  },
+  optimization: {
+    minimize: false
   },
 };
 
