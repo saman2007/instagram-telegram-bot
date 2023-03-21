@@ -2,3 +2,5 @@
 /node_modules/
 /dist/
 /src/configs/config.env
+/.space/
+/Spacefile
