@@ -24,7 +24,9 @@ const downloadPostConversation = async (
       console.log(error);
     }
   } else {
-    await ctx.reply("please enter the url of post that you want to download.");
+    await ctx.reply(
+      "please enter the url of post that you want to download. a correct instagram url starts with https://www.instagram.com/ or https://instagram.com/"
+    );
   }
 };
 
@@ -47,7 +49,9 @@ const downloadStoryConversation = async (
       console.log(error);
     }
   } else {
-    await ctx.reply("please enter the url of post that you want to download.");
+    await ctx.reply(
+      "please enter the url of story that you want to download. a correct instagram url starts with https://www.instagram.com/ or https://instagram.com/"
+    );
   }
 };
 

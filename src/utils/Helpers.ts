@@ -25,13 +25,16 @@ const instaLogin = async (): Promise<IgApiClient> => {
 };
 
 const isInstagramUrl = (url: string) => {
-  return url.startsWith("https://www.instagram.com/");
+  return (
+    url.startsWith("https://www.instagram.com/") ||
+    url.startsWith("https://instagram.com/")
+  );
 };
 
 //a function to extract url/urls of a media
 const getMediaUrlByMediaType = (postItem: any) => {
   let url: InputMedia[] = [];
-    //type 2 is video and type 1 is photo
+  //type 2 is video and type 1 is photo
   //if the media has only one slide of video or photo, it should be handeled like this
   if (postItem.media_type === 1) {
     url = [
@@ -86,7 +89,12 @@ async function getStoryInputMedia(storyUrl: string) {
   const username = splitedStoryUrl[4];
 
   //the id of story
-  const storyId = splitedStoryUrl[5];
+  let storyId = splitedStoryUrl[5];
+
+  if (storyId.includes("?")) {
+    const index = storyId.indexOf("?");
+    storyId = storyId.slice(0, index);
+  }
 
   //the id of person who added the story
   const userId = await ig.user.getIdByUsername(username);
