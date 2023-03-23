@@ -1,5 +1,9 @@
 import { ContextType, ConversationType } from "../types/Types";
-import { getSlidesInputMedia, isInstagramUrl } from "../utils/Helpers";
+import {
+  getPostInputMedia,
+  getStoryInputMedia,
+  isInstagramUrl,
+} from "../utils/Helpers";
 
 const downloadPostConversation = async (
   conversation: ConversationType,
@@ -12,7 +16,7 @@ const downloadPostConversation = async (
   if (isInstagramUrl(message?.text!)) {
     try {
       await ctx.reply("please wait...");
-      const slideUrls: any = await getSlidesInputMedia(message?.text!);
+      const slideUrls: any = await getPostInputMedia(message?.text!);
 
       await ctx.replyWithMediaGroup(slideUrls);
     } catch (error) {
@@ -28,7 +32,23 @@ const downloadStoryConversation = async (
   conversation: ConversationType,
   ctx: ContextType
 ) => {
-  await ctx.reply("downloading story is not available now! coming soon...");
+  await ctx.reply("enter the url of story: ");
+
+  const { message } = await conversation.wait();
+
+  if (isInstagramUrl(message?.text!)) {
+    try {
+      await ctx.reply("please wait...");
+      const storyUrl: any = await getStoryInputMedia(message?.text!);
+
+      await ctx.replyWithMediaGroup(storyUrl);
+    } catch (error) {
+      await ctx.reply("something went wrong... please try again later.");
+      console.log(error);
+    }
+  } else {
+    await ctx.reply("please enter the url of post that you want to download.");
+  }
 };
 
 const downloadProfileImageConversation = async (

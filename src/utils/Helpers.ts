@@ -5,8 +5,8 @@ import { InputMedia } from "grammy/out/types";
 
 /* const cache = new NodeCache(); */
 
-const loginInTostagram = async (): Promise<any> => {
-/*   const cachedData = cache.get("ig");
+const instaLogin = async (): Promise<IgApiClient> => {
+  /*   const cachedData = cache.get("ig");
 
   if (cachedData) return cachedData; */
 
@@ -19,7 +19,7 @@ const loginInTostagram = async (): Promise<any> => {
     process.env.insta_password!
   );
 
-/*   cache.set("ig", ig, 60 ** 2); */
+  /*   cache.set("ig", ig, 60 ** 2); */
 
   return ig;
 };
@@ -28,31 +28,24 @@ const isInstagramUrl = (url: string) => {
   return url.startsWith("https://www.instagram.com/");
 };
 
-async function getSlidesInputMedia(postUrl: string): Promise<InputMedia[]> {
-  const ig: IgApiClient = await loginInTostagram();
-
-  //get the post id in the url and generate an instagram id
-  const postId = urlSegmentToInstagramId(postUrl.split("/")[4]);
-
-  //get the infos of post
-  const postInfos: any = await ig.media.info(postId);
-
-  //the actual post datas
-  const postItem = postInfos.items[0];
-
-  //if the post has only one slide of video or photo, it should be handeled like this
-  if (postItem.media_type === 1)
-    return [
-      { media: postItem.image_versions2.candidates[0].url, type: "video" },
+//a function to extract url/urls of a media
+const getMediaUrlByMediaType = (postItem: any) => {
+  let url: InputMedia[] = [];
+    //type 2 is video and type 1 is photo
+  //if the media has only one slide of video or photo, it should be handeled like this
+  if (postItem.media_type === 1) {
+    url = [
+      { media: postItem.image_versions2.candidates[0].url, type: "photo" },
     ];
-  else if (postItem.media_type === 2)
-    return [{ media: postItem.video_versions[0].url, type: "video" }];
+    return url;
+  } else if (postItem.media_type === 2) {
+    url = [{ media: postItem.video_versions[0].url, type: "video" }];
+    return url;
+  }
 
   const slides = postItem.carousel_media || postItem.video_versions;
 
-  //get the urls of all slides
-  const urls: InputMedia[] = slides.map((post: any) => {
-    //type 2 is video and type 1 is photo
+  url = slides.map((post: any) => {
     if (post.media_type === 2) {
       return {
         media: post.video_versions[0].url,
@@ -66,7 +59,47 @@ async function getSlidesInputMedia(postUrl: string): Promise<InputMedia[]> {
     }
   });
 
-  return urls;
+  return url;
+};
+
+const getPostInputMedia = async (postUrl: string): Promise<InputMedia[]> => {
+  const ig = await instaLogin();
+
+  //get the post id in the url and generate an instagram id
+  const postId = urlSegmentToInstagramId(postUrl.split("/")[4]);
+
+  //get the infos of post
+  const postInfos: any = await ig.media.info(postId);
+
+  //the actual post datas
+  const postItem = postInfos.items[0];
+
+  return getMediaUrlByMediaType(postItem);
+};
+
+async function getStoryInputMedia(storyUrl: string) {
+  const ig = await instaLogin();
+
+  const splitedStoryUrl = storyUrl.split("/");
+
+  //the username of person who added the story
+  const username = splitedStoryUrl[4];
+
+  //the id of story
+  const storyId = splitedStoryUrl[5];
+
+  //the id of person who added the story
+  const userId = await ig.user.getIdByUsername(username);
+
+  const reelsMedia = ig.feed.reelsMedia({ userIds: [userId] });
+
+  //all sstories
+  const stories = await reelsMedia.items();
+
+  //the story that user want to download
+  const realStory = stories.find((story) => story.pk === storyId);
+
+  return getMediaUrlByMediaType(realStory);
 }
 
-export { isInstagramUrl, getSlidesInputMedia };
+export { isInstagramUrl, getPostInputMedia, getStoryInputMedia };
