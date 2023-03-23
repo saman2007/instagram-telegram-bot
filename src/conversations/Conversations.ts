@@ -24,4 +24,22 @@ const downloadPostConversation = async (
   }
 };
 
-export { downloadPostConversation };
+const downloadStoryConversation = async (
+  conversation: ConversationType,
+  ctx: ContextType
+) => {
+  await ctx.reply("downloading story is not available now! coming soon...");
+};
+
+const downloadProfileImageConversation = async (
+  conversation: ConversationType,
+  ctx: ContextType
+) => {
+  ctx.reply("downloading profile image is not available now! coming soon...");
+};
+
+export {
+  downloadPostConversation,
+  downloadStoryConversation,
+  downloadProfileImageConversation,
+};

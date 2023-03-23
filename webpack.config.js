@@ -17,7 +17,7 @@ const someOfConfigs = {
     extensions: [".ts", ".js"],
   },
   optimization: {
-    minimize: false
+    minimize: false,
   },
 };
 
@@ -37,6 +37,14 @@ const BackendConfigs = {
         {
           from: path.resolve(__dirname, "src", "configs"),
           to: path.resolve(__dirname, "dist", "configs"),
+        },
+      ],
+    }),
+    new CopyPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, "package.json"),
+          to: path.resolve(__dirname, "dist"),
         },
       ],
     }),
