@@ -110,4 +110,19 @@ async function getStoryInputMedia(storyUrl: string) {
   return getMediaUrlByMediaType(realStory);
 }
 
-export { isInstagramUrl, getPostInputMedia, getStoryInputMedia };
+const getProfileInputMedia = async (
+  instaUsername: string
+): Promise<InputMedia[]> => {
+  const ig = await instaLogin();
+  const userId = await ig.user.getIdByUsername(instaUsername);
+  const userInfos = await ig.user.info(userId);
+
+  return [{ media: userInfos.hd_profile_pic_url_info.url, type: "photo" }];
+};
+
+export {
+  isInstagramUrl,
+  getPostInputMedia,
+  getStoryInputMedia,
+  getProfileInputMedia,
+};

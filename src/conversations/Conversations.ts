@@ -1,6 +1,7 @@
 import { ContextType, ConversationType } from "../types/Types";
 import {
   getPostInputMedia,
+  getProfileInputMedia,
   getStoryInputMedia,
   isInstagramUrl,
 } from "../utils/Helpers";
@@ -59,7 +60,17 @@ const downloadProfileImageConversation = async (
   conversation: ConversationType,
   ctx: ContextType
 ) => {
-  ctx.reply("downloading profile image is not available now! coming soon...");
+  ctx.reply("enter the username of user that you want his/her profile:");
+  const { message } = await conversation.wait();
+  try {
+    await ctx.reply("please wait...");
+    const profileUrl: any = await getProfileInputMedia(message?.text!);
+
+    await ctx.replyWithMediaGroup(profileUrl);
+  } catch (error) {
+    await ctx.reply("something went wrong... please try again later.");
+    console.log(error);
+  }
 };
 
 export {
