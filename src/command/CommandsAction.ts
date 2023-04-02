@@ -13,4 +13,12 @@ const downloadCommandAc = async (ctx: ContextType) => {
   });
 };
 
-export { startCommandAc, downloadCommandAc };
+const chooseWinnerCommandAc = async (ctx: ContextType) => {
+  await ctx.reply(
+    "did you post a content with great prizes for your followers? now you want to choose winners base on comments of your post? this command is for you!"
+  );
+
+  await ctx.conversation.enter("chooseWinnersConversation");
+};
+
+export { startCommandAc, downloadCommandAc, chooseWinnerCommandAc };

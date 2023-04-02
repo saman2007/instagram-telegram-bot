@@ -3,8 +3,13 @@ import { conversations, createConversation } from "@grammyjs/conversations";
 import { ContextType } from "../types/Types";
 import { downloadMenu } from "../menus/Menus";
 import { commands } from "../command/Commands";
-import { downloadCommandAc, startCommandAc } from "../command/CommandsAction";
 import {
+  chooseWinnerCommandAc,
+  downloadCommandAc,
+  startCommandAc,
+} from "../command/CommandsAction";
+import {
+  chooseWinnersConversation,
   downloadPostConversation,
   downloadProfileImageConversation,
   downloadStoryConversation,
@@ -30,6 +35,7 @@ const setMiddlewares = (
   bot.use(createConversation(downloadPostConversation));
   bot.use(createConversation(downloadStoryConversation));
   bot.use(createConversation(downloadProfileImageConversation));
+  bot.use(createConversation(chooseWinnersConversation));
 
   //set all commands of bot
   bot.api.setMyCommands(commands);
@@ -40,6 +46,7 @@ const setMiddlewares = (
   //set actions of commands
   bot.command("start", startCommandAc);
   bot.command("download", downloadCommandAc);
+  bot.command("choose_winner", chooseWinnerCommandAc);
 
   //server middlewares(only in production)
   if (!devMode) {

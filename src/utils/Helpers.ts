@@ -1,15 +1,8 @@
 import { urlSegmentToInstagramId } from "instagram-id-to-url-segment";
 import { IgApiClient } from "instagram-private-api";
 import { InputMedia } from "grammy/out/types";
-/* import NodeCache from "node-cache"; */
-
-/* const cache = new NodeCache(); */
 
 const instaLogin = async (): Promise<IgApiClient> => {
-  /*   const cachedData = cache.get("ig");
-
-  if (cachedData) return cachedData; */
-
   const ig = new IgApiClient();
 
   //login to instagram
@@ -18,8 +11,6 @@ const instaLogin = async (): Promise<IgApiClient> => {
     process.env.insta_username!,
     process.env.insta_password!
   );
-
-  /*   cache.set("ig", ig, 60 ** 2); */
 
   return ig;
 };
@@ -120,9 +111,55 @@ const getProfileInputMedia = async (
   return [{ media: userInfos.hd_profile_pic_url_info.url, type: "photo" }];
 };
 
+const chooseNWinnersRandomly = (users: string[], n: number) => {
+  const randomUsers = [];
+
+  if (n > users.length) n = users.length;
+
+  for (let index = 0; index < n; index++) {
+    const randomNum = Math.floor(Math.random() * users.length);
+    randomUsers.push(users[randomNum]);
+    users.splice(randomNum, 1);
+  }
+
+  return randomUsers;
+};
+
+const chooseWinnersFromPostComments = async (
+  postUrl: string,
+  nWinners: number
+) => {
+  const ig = await instaLogin();
+
+  //get the post id in the url and generate an instagram id
+  const postId = urlSegmentToInstagramId(postUrl.split("/")[4]);
+
+  const commentsFeed = ig.feed.mediaComments(postId);
+  const commentItems = [];
+
+  let hasMoreComments = true;
+  let counter = 1;
+
+  //get 15 comments for 5 times in each request
+  while (hasMoreComments && counter < 5) {
+    const comments = await commentsFeed.items();
+    commentItems.push(...comments);
+    hasMoreComments = commentsFeed.isMoreAvailable();
+    counter++;
+  }
+
+  //all users that commented on a post
+  const allUsers = commentItems.map((comment) => comment.user.username);
+
+  //get an array of winners
+  const winners = chooseNWinnersRandomly(allUsers, nWinners);
+  return winners;
+};
+
 export {
   isInstagramUrl,
   getPostInputMedia,
   getStoryInputMedia,
   getProfileInputMedia,
+  chooseWinnersFromPostComments,
 };
