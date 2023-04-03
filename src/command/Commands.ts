@@ -8,6 +8,10 @@ const commands = [
     command: "choose_winner",
     description: "choose n winners from comments of a post",
   },
+  {
+    command: "get_caption",
+    description: "get the caption text of a post",
+  },
 ];
 
 export { commands };

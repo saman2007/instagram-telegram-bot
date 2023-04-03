@@ -2,6 +2,9 @@ import { urlSegmentToInstagramId } from "instagram-id-to-url-segment";
 import { IgApiClient } from "instagram-private-api";
 import { InputMedia } from "grammy/out/types";
 
+const getPostId = (postUrl: string) =>
+  urlSegmentToInstagramId(postUrl.split("/")[4]);
+
 const instaLogin = async (): Promise<IgApiClient> => {
   const ig = new IgApiClient();
 
@@ -60,7 +63,7 @@ const getPostInputMedia = async (postUrl: string): Promise<InputMedia[]> => {
   const ig = await instaLogin();
 
   //get the post id in the url and generate an instagram id
-  const postId = urlSegmentToInstagramId(postUrl.split("/")[4]);
+  const postId = getPostId(postUrl);
 
   //get the infos of post
   const postInfos: any = await ig.media.info(postId);
@@ -132,7 +135,7 @@ const chooseWinnersFromPostComments = async (
   const ig = await instaLogin();
 
   //get the post id in the url and generate an instagram id
-  const postId = urlSegmentToInstagramId(postUrl.split("/")[4]);
+  const postId = getPostId(postUrl);
 
   const commentsFeed = ig.feed.mediaComments(postId);
   const commentItems = [];
@@ -156,10 +159,22 @@ const chooseWinnersFromPostComments = async (
   return winners;
 };
 
+const getPostCaption = async (postUrl: string) => {
+  const ig = await instaLogin();
+
+  const postId = getPostId(postUrl);
+
+  const mediaInfo = await ig.media.info(postId);
+
+  //return caption text of the post
+  return mediaInfo.items[0].caption.text;
+};
+
 export {
   isInstagramUrl,
   getPostInputMedia,
   getStoryInputMedia,
   getProfileInputMedia,
   chooseWinnersFromPostComments,
+  getPostCaption,
 };

@@ -6,6 +6,7 @@ import { commands } from "../command/Commands";
 import {
   chooseWinnerCommandAc,
   downloadCommandAc,
+  getCaptionPostCommandAc,
   startCommandAc,
 } from "../command/CommandsAction";
 import {
@@ -13,6 +14,7 @@ import {
   downloadPostConversation,
   downloadProfileImageConversation,
   downloadStoryConversation,
+  getPostCaptionConversation,
 } from "../conversations/Conversations";
 import { Express, json } from "express";
 
@@ -36,6 +38,7 @@ const setMiddlewares = (
   bot.use(createConversation(downloadStoryConversation));
   bot.use(createConversation(downloadProfileImageConversation));
   bot.use(createConversation(chooseWinnersConversation));
+  bot.use(createConversation(getPostCaptionConversation));
 
   //set all commands of bot
   bot.api.setMyCommands(commands);
@@ -47,6 +50,7 @@ const setMiddlewares = (
   bot.command("start", startCommandAc);
   bot.command("download", downloadCommandAc);
   bot.command("choose_winner", chooseWinnerCommandAc);
+  bot.command("get_caption", getCaptionPostCommandAc);
 
   //server middlewares(only in production)
   if (!devMode) {

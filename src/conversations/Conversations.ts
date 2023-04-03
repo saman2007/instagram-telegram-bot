@@ -1,6 +1,7 @@
 import { ContextType, ConversationType } from "../types/Types";
 import {
   chooseWinnersFromPostComments,
+  getPostCaption,
   getPostInputMedia,
   getProfileInputMedia,
   getStoryInputMedia,
@@ -77,6 +78,7 @@ const downloadProfileImageConversation = async (
   }
 };
 
+//conversation for choosing n winners base on comments of a post
 const chooseWinnersConversation = async (
   conversation: ConversationType,
   ctx: ContextType
@@ -120,9 +122,33 @@ const chooseWinnersConversation = async (
   }
 };
 
+const getPostCaptionConversation = async (
+  conversation: ConversationType,
+  ctx: ContextType
+) => {
+  await ctx.reply(
+    "to get caption of an instagram post, enter the url of that instagram post:"
+  );
+
+  const { message: postUrl } = await conversation.wait();
+
+  if (isInstagramUrl(postUrl?.text!)) {
+    await ctx.reply("please wait...");
+
+    try {
+      const postCaption = await getPostCaption(postUrl?.text!);
+      await ctx.reply(postCaption);
+    } catch (error) {
+      await ctx.reply("something went wrong... please try again later.");
+      console.log(error);
+    }
+  }
+};
+
 export {
   downloadPostConversation,
   downloadStoryConversation,
   downloadProfileImageConversation,
   chooseWinnersConversation,
+  getPostCaptionConversation,
 };

@@ -21,4 +21,13 @@ const chooseWinnerCommandAc = async (ctx: ContextType) => {
   await ctx.conversation.enter("chooseWinnersConversation");
 };
 
-export { startCommandAc, downloadCommandAc, chooseWinnerCommandAc };
+const getCaptionPostCommandAc = async (ctx: ContextType) => {
+  await ctx.conversation.enter("getPostCaptionConversation");
+};
+
+export {
+  startCommandAc,
+  downloadCommandAc,
+  chooseWinnerCommandAc,
+  getCaptionPostCommandAc,
+};
