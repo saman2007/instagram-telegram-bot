@@ -15,7 +15,7 @@ const downloadPostConversation = async (
 ) => {
   await ctx.reply("enter the url of post: ");
 
-  const { message } = await conversation.wait();
+  const { message } = await conversation.waitFrom(ctx.from?.id!);
 
   if (isInstagramUrl(message?.text!)) {
     try {
@@ -41,7 +41,7 @@ const downloadStoryConversation = async (
 ) => {
   await ctx.reply("enter the url of story: ");
 
-  const { message } = await conversation.wait();
+  const { message } = await conversation.waitFrom(ctx.from?.id!);
 
   if (isInstagramUrl(message?.text!)) {
     try {
@@ -66,7 +66,9 @@ const downloadProfileImageConversation = async (
   ctx: ContextType
 ) => {
   await ctx.reply("enter the username of user that you want his/her profile:");
-  const { message } = await conversation.wait();
+
+  const { message } = await conversation.waitFrom(ctx.from?.id!);
+
   try {
     await ctx.reply("please wait...");
     const profileUrl: any = await getProfileInputMedia(message?.text!);
@@ -84,7 +86,7 @@ const chooseWinnersConversation = async (
   ctx: ContextType
 ) => {
   await ctx.reply("to choose your winners, enter your url of instagram post:");
-  const { message: postUrl } = await conversation.wait();
+  const { message: postUrl } = await conversation.waitFrom(ctx.from?.id!);
 
   if (isInstagramUrl(postUrl?.text!)) {
     try {
@@ -92,7 +94,9 @@ const chooseWinnersConversation = async (
         "how many winners do you want to choose? (enter a number)"
       );
 
-      const { message: winnersNum } = await conversation.wait();
+      const { message: winnersNum } = await conversation.waitFrom(
+        ctx.from?.id!
+      );
 
       await ctx.reply("please wait...");
 
@@ -129,8 +133,8 @@ const getPostCaptionConversation = async (
   await ctx.reply(
     "to get caption of an instagram post, enter the url of that instagram post:"
   );
-
-  const { message: postUrl } = await conversation.wait();
+  
+  const { message: postUrl } = await conversation.waitFrom(ctx.from?.id!);
 
   if (isInstagramUrl(postUrl?.text!)) {
     await ctx.reply("please wait...");
