@@ -1,36 +1,37 @@
 import { urlSegmentToInstagramId } from "instagram-id-to-url-segment";
 import { IgApiClient } from "instagram-private-api";
 import { InputMedia } from "grammy/out/types";
-import fs from "fs/promises";
-import path from "path";
+import { cookiesDB } from "../database/deta";
+import { CookieJar } from "tough-cookie";
+import { IndexSigniture } from "../types/Types";
 
 const getPostId = (postUrl: string) =>
   urlSegmentToInstagramId(postUrl.split("/")[4]);
 
 const instaLogin = async (): Promise<IgApiClient> => {
-  const cookiePath = path.resolve("cookies.json");
   const username = process.env.insta_username!;
   const password = process.env.insta_password!;
 
   const ig = new IgApiClient();
 
-  //login to instagram
   ig.state.generateDevice(username);
 
   try {
-    const previousSession = await fs.readFile(cookiePath, {
-      encoding: "utf-8",
-    });
+    //get the stored session cookies
+    const previousSession: any = await cookiesDB.get("session_cookie");
 
-    ig.state.deserializeCookieJar(JSON.parse(previousSession));
+    if (!previousSession) throw new Error();
+
+    ig.state.deserializeCookieJar(previousSession);
   } catch (error) {
     await ig.account.login(username, password);
 
-    const serializedSession = await ig.state.serializeCookieJar();
+    //get the serialized session cookie
+    const serializedSession: IndexSigniture<CookieJar.Serialized> =
+      await ig.state.serializeCookieJar();
 
-    await fs.writeFile(cookiePath, JSON.stringify(serializedSession), {
-      encoding: "utf-8",
-    });
+    //store the session cookie
+    await cookiesDB.put(serializedSession, "session_cookie");
   }
 
   return ig;
