@@ -1,19 +1,37 @@
 import { urlSegmentToInstagramId } from "instagram-id-to-url-segment";
 import { IgApiClient } from "instagram-private-api";
 import { InputMedia } from "grammy/out/types";
+import fs from "fs/promises";
+import path from "path";
 
 const getPostId = (postUrl: string) =>
   urlSegmentToInstagramId(postUrl.split("/")[4]);
 
 const instaLogin = async (): Promise<IgApiClient> => {
+  const cookiePath = path.resolve("cookies.json");
+  const username = process.env.insta_username!;
+  const password = process.env.insta_password!;
+
   const ig = new IgApiClient();
 
   //login to instagram
-  ig.state.generateDevice(process.env.insta_username!);
-  await ig.account.login(
-    process.env.insta_username!,
-    process.env.insta_password!
-  );
+  ig.state.generateDevice(username);
+
+  try {
+    const previousSession = await fs.readFile(cookiePath, {
+      encoding: "utf-8",
+    });
+
+    ig.state.deserializeCookieJar(JSON.parse(previousSession));
+  } catch (error) {
+    await ig.account.login(username, password);
+
+    const serializedSession = await ig.state.serializeCookieJar();
+
+    await fs.writeFile(cookiePath, JSON.stringify(serializedSession), {
+      encoding: "utf-8",
+    });
+  }
 
   return ig;
 };
